@@ -3,9 +3,10 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 class Player: 
-    def __init__(self, name=False, attribute=False):
+    def __init__(self, name=False, attribute=False, player_page=False):
         self.name = name 
         self.attribute = attribute
+        self.player_page = player_page
 
     def __repr__(self):
         st = self.name + self.attribute
@@ -14,7 +15,7 @@ class Player:
 class GetPlayerData:
     
     def __init__(self):
-        self.players = []
+        self.players_db = []
 
     def parse_players(self, c, RPM=False):
         soup = BeautifulSoup(c, 'lxml') # Parse the HTML as a string
@@ -25,11 +26,14 @@ class GetPlayerData:
         else: 
             start = 0 
         for i in range(len(playername)): 
-            self.players.append(Player(str(playername[i]).rsplit('</a>', 1)[0].rsplit(">", 1)[1], str(playerstat[i+start]).split(">")[1][:-4]))
+            self.players_db.append(Player(str(playername[i]).rsplit('</a>', 1)[0].rsplit(">", 1)[1], str(playerstat[i+start]).split(">")[1][:-4], 
+            str(playername[i]).rsplit('<a href="', 1)[1].split('">')[0]))
         
     def get_players(self):
-        for player in self.players:
-            print(player.name, player.attribute)
+        return_list = []
+        for player in self.players_db:
+            return_list.append([player.name, float(player.attribute), player.player_page])
+        return return_list
 
 def get_page(url):
         return requests.get(url).text
@@ -69,20 +73,14 @@ def main():
     plus_minus_leaders.parse_players(plus_minus, True)
 
     
-    point_leaders.get_players()
-    print("*"*40)
-    rebound_leaders.get_players()
-    print("*"*40)
-    assist_leaders.get_players()
-    print("*"*40)
-    blocks_leaders.get_players()
-    print("*"*40)
-    fg_percentage_leaders.get_players()
-    print("*"*40)
-    steal_leaders.get_players()
-    print("*"*40)
-    minute_leaders.get_players()
-    print("*"*40)
-    plus_minus_leaders.get_players()
-    
+    data_base = {}
+    data_base["points"] = point_leaders.get_players()
+    data_base["rebounds"] = rebound_leaders.get_players()
+    data_base["assists"] = assist_leaders.get_players()
+    data_base["blocks"] = blocks_leaders.get_players()
+    data_base["fg_percentage"] = fg_percentage_leaders.get_players()
+    data_base["steals"] = steal_leaders.get_players()
+    data_base["minutes"] = minute_leaders.get_players()
+    data_base["plus_minus"] = plus_minus_leaders.get_players()
+    return data_base
 main()
