@@ -48,7 +48,11 @@ def main():
     minutes = get_page('http://www.espn.com/nba/statistics/player/_/stat/minutes')
     plus_minus = get_page('http://www.espn.com/nba/statistics/rpm/_/sort/RPM')
     rookies = get_page('http://www.espn.com/nba/statistics/player/_/stat/scoring-per-game/sort/avgPoints/seasontype/2/position/rookies')
+    games_played = get_page('http://www.espn.com/nba/statistics/player/_/stat/minutes/sort/gamesPlayed/seasontype/2/qualified/false/split/127/count/161')
     
+    games_played_leaders = GetPlayerData()
+    games_played_leaders.parse_players(games_played)
+
     rookie_leaders = GetPlayerData()
     rookie_leaders.parse_players(rookies)
 
@@ -78,6 +82,7 @@ def main():
 
     
     data_base = {}
+    data_base["games_played"] = games_played_leaders.get_players()
     data_base["points"] = point_leaders.get_players()
     data_base["rebounds"] = rebound_leaders.get_players()
     data_base["assists"] = assist_leaders.get_players()
@@ -86,6 +91,6 @@ def main():
     data_base["steals"] = steal_leaders.get_players()
     data_base["minutes"] = minute_leaders.get_players()
     data_base["plus_minus"] = plus_minus_leaders.get_players()
-    data_base["rookies"] = rookie_leaders.get_players()
+    data_base["rookie"] = rookie_leaders.get_players()
     return data_base
 main()
